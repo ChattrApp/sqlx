@@ -186,8 +186,15 @@ func (m *Mapper) TraversalsByNameFunc(t reflect.Type, names []string, fn func(in
 	t = Deref(t)
 	mustBe(t, reflect.Struct)
 	tm := m.TypeMap(t)
+
+	// Lowercase all names for case-insensitive comparison
+	for i := range tm.Names {
+		tm.Names[i].Name = strings.ToLower(tm.Names[i].Name)
+	}
+
 	for i, name := range names {
-		fi, ok := tm.Names[name]
+		lowerCasedName := strings.ToLower(name)
+		fi, ok := tm.Names[lowerCasedName]
 		if !ok {
 			if err := fn(i, nil); err != nil {
 				return err
